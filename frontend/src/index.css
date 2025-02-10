@@ -1,0 +1,109 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+html, body, #root {
+  width: 100%;
+  min-height: 100vh; /* Лучше использовать min-height вместо height */
+  overflow-x: hidden; /* Отключаем горизонтальную прокрутку */
+  display: flex; /* Для гибкого распределения пространства */
+  flex-direction: column; /* Располагаем элементы вертикально */
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1.1em;
+  background-color: #f8f9fa;
+}
+
+/* Контейнер с основным контентом */
+
+
+
+button {
+  border-radius: 8px;
+  border: 1px solid grey;
+  padding: 0.5em 1.1em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color:cadetblue;
+  color:rgb(10, 63, 65);
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+a {
+  font-weight: 500;
+  color: black;
+  text-decoration: inherit;
+}
+a:hover {
+  color:rgb(10, 63, 65);
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modalInput {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.modalButton {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modalButton:hover {
+  background: #0056b3;
+}
+
+.modalCloseButton {
+  background: transparent;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 12px;
+  margin-top: 8px;
+}

@@ -1,0 +1,53 @@
+.appModal {
+  position: fixed;
+  position: fixed; 
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
+  background: rgba(255, 255, 255, 0.9); 
+  padding: 20px;
+  width: 300px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  z-index: 1001;
+}
+
+.appModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+}
+
+
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Контент сверху */
+  flex-grow: 1; /* Контейнер растягивается на всю высоту */
+  width: 100%;
+}
+
+.appHomePage {
+  background-image: url('./assets/app-bg-img.jpg'); 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: calc(100vh - 73px);
+  width: 100%; /* Исправляем */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.authButtons {
+  display: flex;
+  gap: 10px;
+}
+
