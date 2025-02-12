@@ -24,14 +24,16 @@ function Login({ handleSuccess, closeModal }) {
 
         const data = await response.json();
         const token = data.token;
-        if (token) {
+        const user = data.user; //NAME
+        if (token && user && user.name) { //NAME
             localStorage.setItem("token", token);
-            handleSuccess();
+            localStorage.setItem("userName", user.name); //NAME
+            handleSuccess(data); //NAME
         } else {
             setError("No token received");
         }
         } catch (err) {
-        setError("Login failed");
+            setError("Login failed");
         }
     };
 
@@ -58,7 +60,7 @@ function Login({ handleSuccess, closeModal }) {
                 {error && <p className={styles.error}>{error}</p>}
                 <button type="submit" className="modalButton">Login</button>
             </form>
-            <button onClick={closeModal} className="modalCloseButton">Close</button>
+            {/* <button onClick={closeModal} className="modalCloseButton">Close</button> */}
         </div>        
     );
 }
