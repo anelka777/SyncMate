@@ -11,18 +11,25 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Состояние для проверки, авторизован ли user
   const [isModalOpen, setIsModalOpen] = useState(false); // Состояние для открытия мод окна
   const [modalType, setModalType] = useState(null); // Тип мод окна (login или signup)
+  const [userName, setUserName] = useState("");
   const navigate = useNavigate(); // Для переходов на другие страницы
 
   useEffect(() => { // Проверка, есть ли токен в localStorage
     const token = localStorage.getItem('token');
+    const storedUserName = localStorage.getItem("userName");
     if (token) {
       setIsAuthenticated(true); // Если токен есть, считаем, что пользователь авторизован
     }
+    if (storedUserName) {
+      setUserName(storedUserName);
+    } 
   }, []);
 
   const handleLogout = () => {    // Функция для выхода из системы (удаляет токен)
     localStorage.removeItem('token');
+    localStorage.removeItem('userName');
     setIsAuthenticated(false);
+    setUserName("");
     navigate('/');
   };
 
@@ -40,9 +47,13 @@ function App() {
     navigate('/login'); // Переходим на страницу login после успешной регистрации
   };
 
-  const handleSuccessLogin = () => {
+  const handleSuccessLogin = (data) => { //NAME
     closeModal();
     setIsAuthenticated(true); // Устанавливаем, что пользователь авторизован
+    if (data.user && data.user.name) { //NAME
+      localStorage.setItem("userName", data.user.name); // NAME
+      setUserName(data.user.name);
+    } //NAME
     navigate('/dashboard'); // Переходим на страницу Dashboard
   };
 
@@ -50,6 +61,7 @@ function App() {
     <div className={styles.appContainer}>
       <nav className={styles.nav}>
         <NavLink to="/">SyncMate</NavLink>
+        {isAuthenticated && userName && <span className={styles.userName}>Hello, {userName}!</span>}
         <div className={styles.authButtons}>
           {!isAuthenticated && <button onClick={() => openModal('login')}>Log in</button>}
           {isAuthenticated && (
