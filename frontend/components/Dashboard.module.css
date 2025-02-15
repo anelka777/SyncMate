@@ -70,3 +70,8 @@
     margin: 10px;
     
 }
+
+.appItemBtns {
+    display: flex;
+    gap: 5px;
+}
