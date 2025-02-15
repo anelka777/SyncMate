@@ -6,12 +6,14 @@ import styles from "./Dashboard.module.css";
 function Dashboard() {
     const [appointments, setAppointments] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingAppointment, setEditingAppointment] = useState(null);
     const [newAppointment, setNewAppointment] = useState({
         date: '',
         title: '',
         status: 'scheduled',
         description: '',
     });
+    
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -34,21 +36,30 @@ function Dashboard() {
 
 
 
-    const handleOpenModal = () => {
-        // Сбрасываем данные формы перед открытием модального окна
-        setNewAppointment({
-            date: '',
-            title: '',
-            status: 'scheduled',
-            description: '',
-        });
+    const handleOpenModal = (appointment = null) => {
+        if (appointment) {
+            setEditingAppointment(appointment);
+            setNewAppointment({
+                date: appointment.date,
+                title: appointment.title,
+                status: appointment.status,
+                description: appointment.description,
+            });
+        } else {
+            setNewAppointment({
+                date: '',
+                title: '',
+                status: 'scheduled',
+                description: '',
+            });
+            setEditingAppointment(null);
+        }
         setIsModalOpen(true);
     };
 
-
     const handleCloseModal = () => {
-        setIsModalOpen(false);
-    };
+            setIsModalOpen(false);
+        };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -57,6 +68,7 @@ function Dashboard() {
             [name]: value,
         });
     };
+
 
     const handleSubmitNewAppointment = (appointmentData) => {
         const token = localStorage.getItem('token');
@@ -80,6 +92,57 @@ function Dashboard() {
         }
     };
 
+    const handleSubmitUpdateAppointment = (appointmentData) => {
+        const token = localStorage.getItem('token');
+        if (token && editingAppointment) {
+            fetch(`http://localhost:3000/api/v1/appointments/${editingAppointment._id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(appointmentData),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.appointment) {
+                        // Обновляем список встреч с новым состоянием
+                        setAppointments(
+                            appointments.map((app) =>
+                                app._id === data.appointment._id ? data.appointment : app
+                            )
+                        );
+                        handleCloseModal();
+                    }
+                })
+                .catch((error) => console.error('Error updating appointment:', error));
+        }
+    };
+
+
+    // Функция удаления
+    const handleDeleteAppointment = (appointmentId) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch(`http://localhost:3000/api/v1/appointments/${appointmentId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+                .then((response) => response.json())
+                .then(() => {
+                    // Обновляем список записей, удаляя нужную
+                    setAppointments((prevAppointments) =>
+                        prevAppointments.filter((appointment) => appointment._id !== appointmentId)
+                    );
+                })
+                .catch((error) => console.error('Error deleting appointment:', error));
+        }
+    };
+
+
+
     return (
         <div className={styles.dashContainer}>  {/* основная картинка */}
             <div className={styles.dashWorkingTable}>
@@ -92,9 +155,11 @@ function Dashboard() {
                     </button>
                     {isModalOpen && (
                         <AppointmentForm
-                            onSubmit={handleSubmitNewAppointment}
-                            closeModal={handleCloseModal}
-                            className={styles.createAppModal}
+                        onSubmit={editingAppointment ? handleSubmitUpdateAppointment : handleSubmitNewAppointment}
+                        closeModal={handleCloseModal}
+                        className={styles.createAppModal}
+                        appointment={newAppointment} // передаем данные для редактирования
+                        handleInputChange={handleInputChange} // передаем функцию для обработки изменений
                         />
                     )}
                 {/* ================= FILTERS =================== */}
@@ -129,6 +194,10 @@ function Dashboard() {
                                         : "No Date"}</p>
                                     <p><strong>Status: </strong> {appointment.status}</p>
                                     <p><strong>Description: </strong>{appointment.description}</p>
+                                    <button onClick={() => handleOpenModal(appointment)}>Edit</button>
+                                    <button onClick={() => handleDeleteAppointment(appointment._id)} className={styles.deleteButton}>
+                                        Delete
+                                    </button>
                                 </div>
                         ))}   
                     </div>                    
