@@ -1,0 +1,15 @@
+.createAppModal {
+    display: flex;
+    flex-direction: column;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.formBtn {
+    display: flex;
+    gap: 10px;
+}
