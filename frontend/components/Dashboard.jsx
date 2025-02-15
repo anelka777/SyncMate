@@ -1,19 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import AppointmentForm from './AppointmentForm'
+import AppointmentForm from './AppointmentForm';
 import styles from "./Dashboard.module.css";
-
 
 function Dashboard() {
     const [appointments, setAppointments] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingAppointment, setEditingAppointment] = useState(null);
-    const [newAppointment, setNewAppointment] = useState({
+    const [formData, setFormData] = useState({
         date: '',
         title: '',
         status: 'scheduled',
         description: '',
     });
-    
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true, // Для 12-часового формата (AM/PM)
+        });
+    };
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -34,47 +43,49 @@ function Dashboard() {
         }
     }, []);
 
-
-
+    // Функция открытия модального окна для добавления нового или редактирования существующего
     const handleOpenModal = (appointment = null) => {
         if (appointment) {
-            setEditingAppointment(appointment);
-            setNewAppointment({
-                date: appointment.date,
-                title: appointment.title,
-                status: appointment.status,
-                description: appointment.description,
+            setFormData({
+                ...appointment,
             });
         } else {
-            setNewAppointment({
+            setFormData({
                 date: '',
                 title: '',
                 status: 'scheduled',
                 description: '',
             });
-            setEditingAppointment(null);
         }
         setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
-            setIsModalOpen(false);
-        };
+        setIsModalOpen(false);
+    };
 
+    // Функция для изменения данных в форме
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setNewAppointment({
-            ...newAppointment,
+        setFormData((prev) => ({
+            ...prev,
             [name]: value,
-        });
+        }));
     };
 
-
-    const handleSubmitNewAppointment = (appointmentData) => {
+    // Функция для отправки данных
+    const handleSubmit = (appointmentData) => {
         const token = localStorage.getItem('token');
+        const isEditing = appointmentData._id; // Проверяем, редактируем ли мы существующее назначение
+
         if (token) {
-            fetch('http://localhost:3000/api/v1/appointments', {
-                method: 'POST',
+            const method = isEditing ? 'PATCH' : 'POST';
+            const url = isEditing
+                ? `http://localhost:3000/api/v1/appointments/${appointmentData._id}`
+                : 'http://localhost:3000/api/v1/appointments';
+
+            fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -84,43 +95,26 @@ function Dashboard() {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.appointment) {
-                        setAppointments((prevAppointments) => [...prevAppointments, data.appointment]);
-                        handleCloseModal();
+                        if (isEditing) {
+                            setAppointments((prevAppointments) =>
+                                prevAppointments.map((app) =>
+                                    app._id === data.appointment._id ? data.appointment : app
+                                )
+                            );
+                        } else {
+                            setAppointments((prevAppointments) => [
+                                ...prevAppointments,
+                                data.appointment,
+                            ]);
+                        }
+                        handleCloseModal(); // Закрываем модалку после отправки
                     }
                 })
-                .catch((error) => console.error('Error creating appointment:', error));
+                .catch((error) => console.error('Error submitting appointment:', error));
         }
     };
 
-    const handleSubmitUpdateAppointment = (appointmentData) => {
-        const token = localStorage.getItem('token');
-        if (token && editingAppointment) {
-            fetch(`http://localhost:3000/api/v1/appointments/${editingAppointment._id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(appointmentData),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.appointment) {
-                        // Обновляем список встреч с новым состоянием
-                        setAppointments(
-                            appointments.map((app) =>
-                                app._id === data.appointment._id ? data.appointment : app
-                            )
-                        );
-                        handleCloseModal();
-                    }
-                })
-                .catch((error) => console.error('Error updating appointment:', error));
-        }
-    };
-
-
-    // Функция удаления
+    // Функция удаления записи
     const handleDeleteAppointment = (appointmentId) => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -132,7 +126,6 @@ function Dashboard() {
             })
                 .then((response) => response.json())
                 .then(() => {
-                    // Обновляем список записей, удаляя нужную
                     setAppointments((prevAppointments) =>
                         prevAppointments.filter((appointment) => appointment._id !== appointmentId)
                     );
@@ -141,39 +134,24 @@ function Dashboard() {
         }
     };
 
-
-
     return (
-        <div className={styles.dashContainer}>  {/* основная картинка */}
+        <div className={styles.dashContainer}>
             <div className={styles.dashWorkingTable}>
-
-                {/* =======================TOOLS================ */}
                 <div className={styles.dashTools}>
                     <h2>Tools</h2>
-                    <button onClick={handleOpenModal} className={styles.createAppButton}>
+                    <button onClick={() => handleOpenModal()} className={styles.createAppButton}>
                         Create Appointment
                     </button>
                     {isModalOpen && (
                         <AppointmentForm
-                        onSubmit={editingAppointment ? handleSubmitUpdateAppointment : handleSubmitNewAppointment}
-                        closeModal={handleCloseModal}
-                        className={styles.createAppModal}
-                        appointment={newAppointment} // передаем данные для редактирования
-                        handleInputChange={handleInputChange} // передаем функцию для обработки изменений
+                            onSubmit={handleSubmit}
+                            closeModal={handleCloseModal}
+                            appointment={formData}
+                            handleInputChange={handleInputChange}
                         />
                     )}
-                {/* ================= FILTERS =================== */}
-                    <button>Tomorrow</button>
-                    <button>Week view</button>
-                    <button>Month view</button>
                 </div>
 
-                {/*= ========================TODAY =============*/}
-                <div className={styles.todayAppointmentList}>
-                    <h2>Today</h2>
-                </div>    
-
-                {/* ==========================ALL =============*/}
                 <div className={styles.allAppointmentList}>
                     <h2>All Appointments</h2>
                     <div className={styles.allAppBox}>
@@ -182,27 +160,21 @@ function Dashboard() {
                             .map((appointment) => (
                                 <div key={appointment._id} className={styles.appointmentItem}>
                                     <h3>{appointment.title}</h3>
-                                    <p><strong>Date: </strong>{appointment.date
-                                        ? new Date(appointment.date).toLocaleString('en-US', {
-                                            year: 'numeric',
-                                            month: 'numeric',
-                                            day: 'numeric',
-                                            hour: 'numeric',
-                                            minute: '2-digit',
-                                            hour12: true,
-                                        })
-                                        : "No Date"}</p>
-                                    <p><strong>Status: </strong> {appointment.status}</p>
+                                    <p><strong>Date: </strong>{appointment.date ? formatDate(appointment.date) : "No Date"}</p>
+                                    <p><strong>Status: </strong>{appointment.status}</p>
                                     <p><strong>Description: </strong>{appointment.description}</p>
                                     <button onClick={() => handleOpenModal(appointment)}>Edit</button>
-                                    <button onClick={() => handleDeleteAppointment(appointment._id)} className={styles.deleteButton}>
+                                    <button
+                                        onClick={() => handleDeleteAppointment(appointment._id)}
+                                        className={styles.deleteButton}
+                                    >
                                         Delete
                                     </button>
                                 </div>
-                        ))}   
-                    </div>                    
+                            ))}
+                    </div>
                 </div>
-            </div>                
+            </div>
         </div>
     );
 }
