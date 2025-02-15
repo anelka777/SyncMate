@@ -12,24 +12,46 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false); // Состояние для открытия мод окна
   const [modalType, setModalType] = useState(null); // Тип мод окна (login или signup)
   const [userName, setUserName] = useState("");
+  const [appointments, setAppointments] = useState([]);
   const navigate = useNavigate(); // Для переходов на другие страницы
+
 
   useEffect(() => { // Проверка, есть ли токен в localStorage
     const token = localStorage.getItem('token');
     const storedUserName = localStorage.getItem("userName");
     if (token) {
       setIsAuthenticated(true); // Если токен есть, считаем, что пользователь авторизован
+      fetchAppointments();
     }
     if (storedUserName) {
       setUserName(storedUserName);
     } 
   }, []);
 
+// Функция для загрузки appointments с сервера
+const fetchAppointments = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/api/v1/appointments', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`, // Передаем токен для авторизации
+      },
+    });
+    const data = await response.json();
+    setAppointments(data); // Сохраняем appointments в стейте
+  } catch (error) {
+    console.error('Error fetching appointments:', error);
+  }
+};
+
+
   const handleLogout = () => {    // Функция для выхода из системы (удаляет токен)
     localStorage.removeItem('token');
     localStorage.removeItem('userName');
     setIsAuthenticated(false);
     setUserName("");
+    setAppointments([]); // Очищаем appointments при выходе
     navigate('/');
   };
 
@@ -55,6 +77,7 @@ function App() {
       setUserName(data.user.name);
     } //NAME
     navigate('/dashboard'); // Переходим на страницу Dashboard
+    fetchAppointments(); // После успешного входа загружаем appointments
   };
 
   return (
