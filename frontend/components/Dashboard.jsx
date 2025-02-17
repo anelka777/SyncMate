@@ -11,6 +11,7 @@ function Dashboard() {
         status: 'scheduled',
         description: '',
     });
+    const [activeTab, setActiveTab] = useState('today'); // "today" или "tomorrow"
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -23,6 +24,8 @@ function Dashboard() {
             hour12: true, // Для 12-часового формата (AM/PM)
         });
     };
+
+    const [filterStatus, setFilterStatus] = useState("all"); // Храним текущий фильтр
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -134,14 +137,84 @@ function Dashboard() {
         }
     };
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Убираем время
+
+    // Сначала фильтруем по дате (оставляем будущие)
+    const upcomingAppointments = appointments.filter((appointment) => {
+        const appointmentDate = new Date(appointment.date);
+        return appointmentDate >= today;
+    });
+
+    // Затем фильтруем по статусу
+    const filteredAppointments = upcomingAppointments.filter((appointment) => 
+        filterStatus === "all" || appointment.status === filterStatus
+    );
+
+    const getFilteredAppointments = (day) => {
+        const filterDate = new Date();
+        if (day === 'tomorrow') {
+            filterDate.setDate(filterDate.getDate() + 1); // Завтра
+        }
+        filterDate.setHours(0, 0, 0, 0); // Сбрасываем время
+    
+        return appointments.filter((appointment) => {
+            const appointmentDate = new Date(appointment.date);
+            return (
+                appointmentDate.getFullYear() === filterDate.getFullYear() &&
+                appointmentDate.getMonth() === filterDate.getMonth() &&
+                appointmentDate.getDate() === filterDate.getDate()
+            );
+        });
+    };
     return (
         <div className={styles.dashContainer}>
             <div className={styles.dashWorkingTable}>
+    {/* ============================FOR TODAY / TOMORROW */}
+                <div className={styles.todayAppointmentList}>
+                    <h2>Reminder</h2>
+                    <div className={styles.tabContainer}>
+                        <button
+                            className={activeTab === 'today' ? styles.activeTab : ''}
+                            onClick={() => setActiveTab('today')}
+                        >
+                            Today
+                        </button>
+                        <button
+                            className={activeTab === 'tomorrow' ? styles.activeTab : ''}
+                            onClick={() => setActiveTab('tomorrow')}
+                        >
+                            Tomorrow
+                        </button>
+                    </div>
+
+                    <div className={styles.appointmentListBox}>
+                        <h2>{activeTab === 'today' ? "Your Day Today" : "Your Day Tomorrow"}</h2>
+                        <div className={styles.appointmentList}>
+                            {getFilteredAppointments(activeTab).length > 0 ? (
+                                getFilteredAppointments(activeTab)
+                                    .sort((a, b) => new Date(a.date) - new Date(b.date))
+                                    .map((appointment) => (
+                                        <div key={appointment._id} className={styles.appointmentItem}>
+                                            <h3>{appointment.title}</h3>
+                                            <p><strong>Time: </strong>{formatDate(appointment.date)}</p>
+                                            <p><strong>Status: </strong>{appointment.status}</p>
+                                            <p><strong>Description: </strong>{appointment.description}</p>
+                                        </div>
+                                    ))
+                            ) : (
+                                <p>No appointments for {activeTab === 'today' ? "today" : "tomorrow"}.</p>
+                            )}
+                        </div>                        
+                    </div>
+                </div>
+
+    {/* ======================TOOLS CONTAINER================================ */}
                 <div className={styles.dashTools}>
                     <h2>Tools</h2>
                     <button onClick={() => handleOpenModal()} className={styles.createAppButton}>
                         Create Appointment
-                    </button>
+                    </button>                    
                     {isModalOpen && (
                         <AppointmentForm
                             onSubmit={handleSubmit}
@@ -151,27 +224,49 @@ function Dashboard() {
                         />
                     )}
                 </div>
+    {/*=====================APPOINTMENT CONTAINER=============================  */}
+                <div className={styles.allAppointmentContainer}>
+                    <h2>Appointments</h2>
+                    {/* Выпадающий список для фильтрации */}
+                    <div className={styles.filterContainer}>
+                        <label htmlFor="statusFilter" className={styles.filterLabel}>Filter by Status: </label>
+                        <select 
+                            id="statusFilter"
+                            value={filterStatus} 
+                            onChange={(e) => setFilterStatus(e.target.value)} 
+                            className={styles.filterSelect}
+                        >
+                            <option value="all">All</option>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="completed">Completed</option>
+                            <option value="canceled">Canceled</option>
+                        </select>
+                    </div>
 
-                <div className={styles.allAppointmentList}>
-                    <h2>All Appointments</h2>
                     <div className={styles.allAppBox}>
-                        {appointments
-                            .sort((a, b) => new Date(a.date) - new Date(b.date))
-                            .map((appointment) => (
-                                <div key={appointment._id} className={styles.appointmentItem}>
-                                    <h3>{appointment.title}</h3>
-                                    <p><strong>Date: </strong>{appointment.date ? formatDate(appointment.date) : "No Date"}</p>
-                                    <p><strong>Status: </strong>{appointment.status}</p>
-                                    <p><strong>Description: </strong>{appointment.description}</p>
-                                    <button onClick={() => handleOpenModal(appointment)}>Edit</button>
-                                    <button
-                                        onClick={() => handleDeleteAppointment(appointment._id)}
-                                        className={styles.deleteButton}
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            ))}
+                        {filteredAppointments.length > 0 ? (
+                            filteredAppointments
+                                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                                .map((appointment) => (
+                                    <div key={appointment._id} className={styles.appointmentItem}>
+                                        <h3>{appointment.title}</h3>
+                                        <p><strong>Date: </strong>{appointment.date ? formatDate(appointment.date) : "No Date"}</p>
+                                        <p><strong>Status: </strong>{appointment.status}</p>
+                                        <p><strong>Description: </strong>{appointment.description}</p>
+                                        <div className={styles.appItemBtns}>
+                                            <button onClick={() => handleOpenModal(appointment)}>Edit</button>
+                                            <button
+                                                onClick={() => handleDeleteAppointment(appointment._id)}
+                                                className={styles.deleteButton}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                        ) : (
+                            <p>No appointments found for selected status.</p>
+                        )}
                     </div>
                 </div>
             </div>
