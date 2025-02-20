@@ -48,10 +48,32 @@
 
 .appointmentList {
     display: flex;
+    /* flex-direction: column; */
     flex-wrap: wrap;
     justify-content: center;    
 }
 
+.appointmentItemToday {
+    display: flex;
+    background-color: white;
+    max-width: 280px;  /*350px*/
+    border: 1px solid black;
+    border-radius: 8px;
+    padding: 6px; /*10px*/
+    margin: 4px;  /*5px*/
+    font-size: 0.9rem; /* Уменьшенный шрифт */
+}
+
+.appItemOne {
+    padding: 4px;
+}
+
+.appItemTwo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 4px;
+}
 
 .tabContainer {
     display: flex;
@@ -138,8 +160,7 @@
     flex-wrap: wrap;
     max-width: 85%;
     justify-content: center;
-    
-    gap: 10px;
+    gap: 5px;
     padding: 10px;
     margin: 25px;
     background-color: rgba(240, 248, 255, 0.6);
@@ -148,17 +169,28 @@
 
 .appointmentItem {
     background-color: rgba(100, 149, 237, 0.6);
-    max-width: 350px;
+    max-width: 280px; /*350px*/
     border: 1px solid black;
     border-radius: 8px;
-    padding: 10px;
-    margin: 5px;
+    padding: 6px; /*10px*/
+    margin: 4px; /*5px*/
+    font-size: 0.9rem; /* Уменьшенный шрифт */   
     
 }
 
 .appItemBtns {
     display: flex;
-    gap: 5px;
+    gap: 4px;
 }
 
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 5px;    
+}
 
+.filtersContainer {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+}

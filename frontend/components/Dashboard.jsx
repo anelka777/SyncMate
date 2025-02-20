@@ -12,6 +12,10 @@ function Dashboard() {
         description: '',
     });
     const [activeTab, setActiveTab] = useState('today'); // "today" или "tomorrow"
+    const [currentPageReminders, setCurrentPageReminders] = useState(1);
+    const [currentPageAppointments, setCurrentPageAppointments] = useState(1);
+    const itemsPerPage = 12;
+    const [filterStatus, setFilterStatus] = useState("all"); // Храним текущий фильтр
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -24,8 +28,7 @@ function Dashboard() {
             hour12: true, // Для 12-часового формата (AM/PM)
         });
     };
-
-    const [filterStatus, setFilterStatus] = useState("all"); // Храним текущий фильтр
+    
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -80,7 +83,6 @@ function Dashboard() {
     const handleSubmit = (appointmentData) => {
         const token = localStorage.getItem('token');
         const isEditing = appointmentData._id; // Проверяем, редактируем ли мы существующее назначение
-
         if (token) {
             const method = isEditing ? 'PATCH' : 'POST';
             const url = isEditing
@@ -167,6 +169,17 @@ function Dashboard() {
             );
         });
     };
+
+
+    const paginatedReminders = getFilteredAppointments(activeTab)
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice((currentPageReminders - 1) * itemsPerPage, currentPageReminders * itemsPerPage);
+
+    const paginatedAppointments = filteredAppointments
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice((currentPageAppointments - 1) * itemsPerPage, currentPageAppointments * itemsPerPage);
+
+
     return (
         <div className={styles.dashContainer}>
             <div className={styles.dashWorkingTable}>
@@ -177,35 +190,53 @@ function Dashboard() {
                         <button
                             className={activeTab === 'today' ? styles.activeTab : ''}
                             onClick={() => setActiveTab('today')}
-                        >
-                            Today
+                        >Today
                         </button>
                         <button
                             className={activeTab === 'tomorrow' ? styles.activeTab : ''}
                             onClick={() => setActiveTab('tomorrow')}
-                        >
-                            Tomorrow
+                        >Tomorrow
                         </button>
                     </div>
 
                     <div className={styles.appointmentListBox}>
                         <h2>{activeTab === 'today' ? "Your Day Today" : "Your Day Tomorrow"}</h2>
                         <div className={styles.appointmentList}>
-                            {getFilteredAppointments(activeTab).length > 0 ? (
+                            {/* {getFilteredAppointments(activeTab).length > 0 ? (
                                 getFilteredAppointments(activeTab)
                                     .sort((a, b) => new Date(a.date) - new Date(b.date))
-                                    .map((appointment) => (
-                                        <div key={appointment._id} className={styles.appointmentItem}>
-                                            <h3>{appointment.title}</h3>
-                                            <p><strong>Time: </strong>{formatDate(appointment.date)}</p>
-                                            <p><strong>Status: </strong>{appointment.status}</p>
-                                            <p><strong>Description: </strong>{appointment.description}</p>
-                                        </div>
+                                    .map((appointment) => ( */}
+                            {paginatedReminders.length > 0 ? (
+                                paginatedReminders.map((appointment) => (
+                                        <div key={appointment._id} className={styles.appointmentItemToday}>
+                                            <div className={styles.appItemOne}>
+                                                <p>{new Date(appointment.date)
+                                                    .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                                                </p>
+                                            </div>
+                                            <div className={styles.appItemTwo}>
+                                                <h3>{appointment.title}</h3>
+                                                <p><strong>Status: </strong>{appointment.status}</p>
+                                                <p><strong>Description: </strong>{appointment.description}</p>
+                                            </div>
+                                        </div>                                        
                                     ))
                             ) : (
                                 <p>No appointments for {activeTab === 'today' ? "today" : "tomorrow"}.</p>
                             )}
                         </div>                        
+                    </div>
+
+                    <div className={styles.pagination}>
+                        <button onClick={() => setCurrentPageReminders(currentPageReminders - 1)} 
+                                disabled={currentPageReminders === 1}>
+                            Previous
+                        </button>
+                        <span>Page {currentPageReminders}</span>
+                        <button onClick={() => setCurrentPageReminders(currentPageReminders + 1)}
+                                disabled={currentPageReminders >= Math.ceil(getFilteredAppointments(activeTab).length / itemsPerPage)}>
+                            Next
+                        </button>
                     </div>
                 </div>
 
@@ -244,10 +275,12 @@ function Dashboard() {
                     </div>
 
                     <div className={styles.allAppBox}>
-                        {filteredAppointments.length > 0 ? (
+                        {/* {filteredAppointments.length > 0 ? (
                             filteredAppointments
                                 .sort((a, b) => new Date(a.date) - new Date(b.date))
-                                .map((appointment) => (
+                                .map((appointment) => ( */}
+                        {paginatedAppointments.length > 0 ? (
+                            paginatedAppointments.map((appointment) => (
                                     <div key={appointment._id} className={styles.appointmentItem}>
                                         <h3>{appointment.title}</h3>
                                         <p><strong>Date: </strong>{appointment.date ? formatDate(appointment.date) : "No Date"}</p>
@@ -267,6 +300,14 @@ function Dashboard() {
                         ) : (
                             <p>No appointments found for selected status.</p>
                         )}
+                    </div>
+
+                    <div className={styles.pagination}>
+                        <button onClick={() => setCurrentPageAppointments(currentPageAppointments - 1)}
+                            disabled={currentPageAppointments === 1}>Previous</button>
+                        <span>Page {currentPageAppointments}</span>
+                        <button onClick={() => setCurrentPageAppointments(currentPageAppointments + 1)}
+                            disabled={currentPageAppointments * itemsPerPage >= filteredAppointments.length}>Next</button>
                     </div>
                 </div>
             </div>
