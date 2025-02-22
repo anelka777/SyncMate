@@ -78,6 +78,7 @@ function AppointmentForm({ onSubmit, closeModal, appointment, handleInputChange 
                     <option value="scheduled">Scheduled</option>
                     <option value="completed">Completed</option>
                     <option value="canceled">Canceled</option>
+                    <option value="no show">No show</option>
                 </select>
             </label>
 

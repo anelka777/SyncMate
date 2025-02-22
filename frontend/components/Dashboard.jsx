@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import AppointmentForm from './AppointmentForm';
 import styles from "./Dashboard.module.css";
+import Clock from "./Clock";
+import WeekViewChart from "./WeekViewChart";
 
 function Dashboard() {
     const [appointments, setAppointments] = useState([]);
@@ -16,6 +18,10 @@ function Dashboard() {
     const [currentPageAppointments, setCurrentPageAppointments] = useState(1);
     const itemsPerPage = 12;
     const [filterStatus, setFilterStatus] = useState("all"); // Храним текущий фильтр
+    const [filterDate, setFilterDate] = useState('');
+
+
+
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -48,6 +54,12 @@ function Dashboard() {
                 .catch((error) => console.error('Error fetching appointments:', error));
         }
     }, []);
+
+
+    useEffect(() => {
+        setCurrentPageAppointments(1);
+        setCurrentPageReminders(1);
+    }, [filterStatus, filterDate, activeTab]);
 
     // Функция открытия модального окна для добавления нового или редактирования существующего
     const handleOpenModal = (appointment = null) => {
@@ -140,18 +152,24 @@ function Dashboard() {
     };
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Убираем время
-
-    // Сначала фильтруем по дате (оставляем будущие)
+    today.setHours(0, 0, 0, 0); // Обнуляем время
+    
     const upcomingAppointments = appointments.filter((appointment) => {
         const appointmentDate = new Date(appointment.date);
         return appointmentDate >= today;
     });
-
-    // Затем фильтруем по статусу
+    
     const filteredAppointments = upcomingAppointments.filter((appointment) => 
         filterStatus === "all" || appointment.status === filterStatus
     );
+    
+    const finalFilteredAppointments = filteredAppointments.filter((appointment) => {
+        if (!filterDate) return true; // Если дата не выбрана, показываем все
+        const appointmentDate = new Date(appointment.date);
+        const formattedAppointmentDate = appointmentDate.toLocaleDateString('en-CA'); // "YYYY-MM-DD"
+        return formattedAppointmentDate === filterDate;
+    });
+
 
     const getFilteredAppointments = (day) => {
         const filterDate = new Date();
@@ -175,14 +193,44 @@ function Dashboard() {
         .sort((a, b) => new Date(a.date) - new Date(b.date))
         .slice((currentPageReminders - 1) * itemsPerPage, currentPageReminders * itemsPerPage);
 
-    const paginatedAppointments = filteredAppointments
+    const paginatedAppointments = finalFilteredAppointments
         .sort((a, b) => new Date(a.date) - new Date(b.date))
         .slice((currentPageAppointments - 1) * itemsPerPage, currentPageAppointments * itemsPerPage);
 
 
-    return (
+    return (       
         <div className={styles.dashContainer}>
             <div className={styles.dashWorkingTable}>
+
+                {/* ======================TOOLS CONTAINER================================ */}
+                <div className={styles.dashToolsContainer}>
+                    <div className={styles.dashTools}>
+                        <Clock />
+                    </div>
+
+                    
+                    <div className={styles.dashTools}>
+                        <h2>New Appointment</h2>
+                        <button onClick={() => handleOpenModal()} className={styles.createAppButton}>
+                            + Add
+                        </button>                    
+                        {isModalOpen && (
+                            <AppointmentForm
+                                onSubmit={handleSubmit}
+                                closeModal={handleCloseModal}
+                                appointment={formData}
+                                handleInputChange={handleInputChange}
+                            />
+                        )}
+                    </div>
+
+                    <div className={styles.dashTools}>
+                        {/* <h2>Week Overview</h2> */}
+                        <WeekViewChart appointments={appointments} />
+                    </div>
+                </div>
+
+
     {/* ============================FOR TODAY / TOMORROW */}
                 <div className={styles.todayAppointmentList}>
                     <h2>Reminder</h2>
@@ -200,7 +248,7 @@ function Dashboard() {
                     </div>
 
                     <div className={styles.appointmentListBox}>
-                        <h2>{activeTab === 'today' ? "Your Day Today" : "Your Day Tomorrow"}</h2>
+                        <h3>{activeTab === 'today' ? "Your Day Today" : "Your Day Tomorrow"}</h3>
                         <div className={styles.appointmentList}>
                             {/* {getFilteredAppointments(activeTab).length > 0 ? (
                                 getFilteredAppointments(activeTab)
@@ -238,41 +286,47 @@ function Dashboard() {
                             Next
                         </button>
                     </div>
-                </div>
 
-    {/* ======================TOOLS CONTAINER================================ */}
-                <div className={styles.dashTools}>
-                    <h2>Tools</h2>
-                    <button onClick={() => handleOpenModal()} className={styles.createAppButton}>
-                        Create Appointment
-                    </button>                    
-                    {isModalOpen && (
-                        <AppointmentForm
-                            onSubmit={handleSubmit}
-                            closeModal={handleCloseModal}
-                            appointment={formData}
-                            handleInputChange={handleInputChange}
-                        />
-                    )}
+
+                    
                 </div>
+                
+                
+
+                
     {/*=====================APPOINTMENT CONTAINER=============================  */}
                 <div className={styles.allAppointmentContainer}>
-                    <h2>Appointments</h2>
-                    {/* Выпадающий список для фильтрации */}
-                    <div className={styles.filterContainer}>
-                        <label htmlFor="statusFilter" className={styles.filterLabel}>Filter by Status: </label>
-                        <select 
-                            id="statusFilter"
-                            value={filterStatus} 
-                            onChange={(e) => setFilterStatus(e.target.value)} 
-                            className={styles.filterSelect}
-                        >
-                            <option value="all">All</option>
-                            <option value="scheduled">Scheduled</option>
-                            <option value="completed">Completed</option>
-                            <option value="canceled">Canceled</option>
-                        </select>
+                    <h2>All Appointments</h2>
+                    <div className={styles.filtersContainer}>
+                        <div className={styles.filterContainer}>
+                            <label htmlFor="dateFilter" className={styles.filterLabel}>Filter by Date: </label>
+                            <input 
+                                type="date" 
+                                id="dateFilter" 
+                                value={filterDate} 
+                                onChange={(e) => setFilterDate(e.target.value)} 
+                                className={styles.filterInput}
+                            />
+                        </div>
+
+                        {/* Выпадающий список для фильтрации */}
+                        <div className={styles.filterContainer}>
+                            <label htmlFor="statusFilter" className={styles.filterLabel}>Filter by Status: </label>
+                            <select 
+                                id="statusFilter"
+                                value={filterStatus} 
+                                onChange={(e) => setFilterStatus(e.target.value)} 
+                                className={styles.filterSelect}
+                            >
+                                <option value="all">All</option>
+                                <option value="scheduled">Scheduled</option>
+                                <option value="completed">Completed</option>
+                                <option value="canceled">Canceled</option>
+                                <option value="no show">No show</option>
+                            </select>
+                        </div>
                     </div>
+                    
 
                     <div className={styles.allAppBox}>
                         {/* {filteredAppointments.length > 0 ? (
@@ -307,7 +361,9 @@ function Dashboard() {
                             disabled={currentPageAppointments === 1}>Previous</button>
                         <span>Page {currentPageAppointments}</span>
                         <button onClick={() => setCurrentPageAppointments(currentPageAppointments + 1)}
-                            disabled={currentPageAppointments * itemsPerPage >= filteredAppointments.length}>Next</button>
+                                disabled={currentPageAppointments >= Math.ceil(finalFilteredAppointments.length / itemsPerPage)}>
+                                Next
+                        </button>
                     </div>
                 </div>
             </div>
