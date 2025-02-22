@@ -101,7 +101,7 @@ const fetchAppointments = async () => {
           <Route path="/" element={
               <div className={styles.appHomePage}>
                 <h1>Welcome to SyncMate</h1>
-                <h3>Slogan</h3>
+                <h3>Use your time wise</h3>
               </div>
             }
           />

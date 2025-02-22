@@ -38,7 +38,7 @@ nav {
 
 button {
   border-radius: 8px;
-  border: 1px solid grey;
+  border: 1px solid navajowhite;
   padding: 0.5em 1.1em;
   font-size: 1em;
   font-weight: 500;
@@ -48,12 +48,14 @@ button {
 }
 
 button:hover {
-  border-color:cadetblue;
-  color:rgb(10, 63, 65);
+  background-color: navajowhite;
+  /* color: #007bff; */
+  border-color: grey;
 }
+
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 1px auto -webkit-focus-ring-color;
 }
 
 a {
@@ -87,6 +89,7 @@ h1 {
 
 .modalButton {
   background: #007bff;
+  /*background: grey;*/
   color: white;
   border: none;
   padding: 8px;
@@ -98,7 +101,7 @@ h1 {
 .modalButton:hover {
   background: #0056b3;
 }
-
+/*
 .modalCloseButton {
   background: transparent;
   border: none;
@@ -107,3 +110,4 @@ h1 {
   font-size: 12px;
   margin-top: 8px;
 }
+*/

@@ -1,0 +1,15 @@
+.clock {
+    
+    text-align: center;
+    border-radius: 8px;
+    /* padding: 5px; */
+    
+}
+
+.clockBox {
+    background-color: rgba(255, 255, 255, 0.6);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px double #b2eefc;
+    font-weight: 500;
+}
