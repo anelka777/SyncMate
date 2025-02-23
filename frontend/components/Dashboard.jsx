@@ -22,7 +22,6 @@ function Dashboard() {
 
 
 
-
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleString('en-US', {
@@ -33,8 +32,7 @@ function Dashboard() {
             minute: '2-digit',
             hour12: true, // Для 12-часового формата (AM/PM)
         });
-    };
-    
+    };    
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -201,13 +199,11 @@ function Dashboard() {
     return (       
         <div className={styles.dashContainer}>
             <div className={styles.dashWorkingTable}>
-
                 {/* ======================TOOLS CONTAINER================================ */}
                 <div className={styles.dashToolsContainer}>
                     <div className={styles.dashTools}>
                         <Clock />
                     </div>
-
                     
                     <div className={styles.dashTools}>
                         <h2>New Appointment</h2>
@@ -225,11 +221,9 @@ function Dashboard() {
                     </div>
 
                     <div className={styles.dashTools}>
-                        {/* <h2>Week Overview</h2> */}
                         <WeekViewChart appointments={appointments} />
                     </div>
                 </div>
-
 
     {/* ============================FOR TODAY / TOMORROW */}
                 <div className={styles.todayAppointmentList}>
@@ -250,13 +244,13 @@ function Dashboard() {
                     <div className={styles.appointmentListBox}>
                         <h3>{activeTab === 'today' ? "Your Day Today" : "Your Day Tomorrow"}</h3>
                         <div className={styles.appointmentList}>
-                            {/* {getFilteredAppointments(activeTab).length > 0 ? (
-                                getFilteredAppointments(activeTab)
-                                    .sort((a, b) => new Date(a.date) - new Date(b.date))
-                                    .map((appointment) => ( */}
+                            
                             {paginatedReminders.length > 0 ? (
                                 paginatedReminders.map((appointment) => (
-                                        <div key={appointment._id} className={styles.appointmentItemToday}>
+                                        <div key={appointment._id} 
+                                        className={`${styles.appointmentItemToday} 
+                                        ${appointment?.status === 'completed' ? styles.completed : ''} 
+                                        ${appointment?.status === 'canceled' ? styles.canceled : ''}`}>
                                             <div className={styles.appItemOne}>
                                                 <p>{new Date(appointment.date)
                                                     .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
@@ -285,13 +279,8 @@ function Dashboard() {
                                 disabled={currentPageReminders >= Math.ceil(getFilteredAppointments(activeTab).length / itemsPerPage)}>
                             Next
                         </button>
-                    </div>
-
-
-                    
+                    </div>                    
                 </div>
-                
-                
 
                 
     {/*=====================APPOINTMENT CONTAINER=============================  */}
@@ -325,30 +314,28 @@ function Dashboard() {
                                 <option value="no show">No show</option>
                             </select>
                         </div>
-                    </div>
-                    
+                    </div>                    
 
                     <div className={styles.allAppBox}>
-                        {/* {filteredAppointments.length > 0 ? (
-                            filteredAppointments
-                                .sort((a, b) => new Date(a.date) - new Date(b.date))
-                                .map((appointment) => ( */}
                         {paginatedAppointments.length > 0 ? (
                             paginatedAppointments.map((appointment) => (
-                                    <div key={appointment._id} className={styles.appointmentItem}>
-                                        <h3>{appointment.title}</h3>
-                                        <p><strong>Date: </strong>{appointment.date ? formatDate(appointment.date) : "No Date"}</p>
-                                        <p><strong>Status: </strong>{appointment.status}</p>
-                                        <p><strong>Description: </strong>{appointment.description}</p>
-                                        <div className={styles.appItemBtns}>
-                                            <button onClick={() => handleOpenModal(appointment)}>Edit</button>
-                                            <button
-                                                onClick={() => handleDeleteAppointment(appointment._id)}
-                                                className={styles.deleteButton}
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
+                                    <div key={appointment._id} 
+                                        className={`${styles.appointmentItem} 
+                                        ${appointment.status === 'completed' ? styles.completed : ''} 
+                                        ${appointment.status === 'canceled' ? styles.canceled : ''}`}>
+                                            <h3>{appointment.title}</h3>
+                                            <p><strong>Date: </strong>{appointment.date ? formatDate(appointment.date) : "No Date"}</p>
+                                            <p><strong>Status: </strong>{appointment.status}</p>
+                                            <p><strong>Description: </strong>{appointment.description}</p>
+                                            <div className={styles.appItemBtns}>
+                                                <button onClick={() => handleOpenModal(appointment)}>Edit</button>
+                                                <button
+                                                    onClick={() => handleDeleteAppointment(appointment._id)}
+                                                    className={styles.deleteButton}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
                                     </div>
                                 ))
                         ) : (
