@@ -66,16 +66,15 @@ const fetchAppointments = async () => {
 
   const handleSuccessSignup = () => {
     closeModal();
-    navigate('/login'); // Переходим на страницу login после успешной регистрации
   };
 
-  const handleSuccessLogin = (data) => { //NAME
+  const handleSuccessLogin = (data) => {
     closeModal();
     setIsAuthenticated(true); // Устанавливаем, что пользователь авторизован
-    if (data.user && data.user.name) { //NAME
+    if (data.user && data.user.name) { 
       localStorage.setItem("userName", data.user.name); // NAME
       setUserName(data.user.name);
-    } //NAME
+    } 
     navigate('/dashboard'); // Переходим на страницу Dashboard
     fetchAppointments(); // После успешного входа загружаем appointments
   };
@@ -100,14 +99,17 @@ const fetchAppointments = async () => {
         <Routes>
           <Route path="/" element={
               <div className={styles.appHomePage}>
-                <h1>Welcome to SyncMate</h1>
-                <h3>Use your time wise</h3>
+                <div className={styles.appHomeBox}>
+                  <h1>Welcome to SyncMate</h1>
+                  <h3>Use your time wise</h3>
+                </div>
+                
               </div>
             }
           />
           <Route 
             path="/signup" 
-            element={<Signup handleSuccess={handleSuccessSignup} />} 
+            element={<Signup handleSuccess={handleSuccessSignup} closeModal={closeModal} />} 
           />
           <Route 
             path="/login" 

@@ -1,15 +1,13 @@
 .clock {
-    
     text-align: center;
     border-radius: 8px;
-    /* padding: 5px; */
-    
 }
 
 .clockBox {
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 6px rgba(0, 0, 0 , 0.5);
     padding: 15px;
     border-radius: 8px;
-    border: 1px double #b2eefc;
+    border: 3px double #b2eefc;
     font-weight: 500;
 }

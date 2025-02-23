@@ -46,6 +46,15 @@
   color: white;
 }
 
+.appHomeBox {
+  text-align: center;
+  padding: 2rem;
+  background-color: rgba(255, 222, 173, 0.8);
+  box-shadow: 0 4px 6px rgba(0, 0, 0 , 0.7);
+  border-radius: 8px;
+  color: black;
+}
+
 .authButtons {
   display: flex;
   gap: 10px;

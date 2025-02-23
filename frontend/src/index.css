@@ -17,10 +17,10 @@
 
 html, body, #root {
   width: 100%;
-  min-height: 100vh; /* Лучше использовать min-height вместо height */
-  overflow-x: hidden; /* Отключаем горизонтальную прокрутку */
-  display: flex; /* Для гибкого распределения пространства */
-  flex-direction: column; /* Располагаем элементы вертикально */
+  min-height: 100vh;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 nav {
@@ -32,9 +32,6 @@ nav {
   background-color: #f8f9fa;
 }
 
-/* Контейнер с основным контентом */
-
-
 
 button {
   border-radius: 8px;
@@ -45,11 +42,11 @@ button {
   font-family: inherit;
   cursor: pointer;
   transition: border-color 0.25s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0 , 0.5);
 }
 
 button:hover {
   background-color: navajowhite;
-  /* color: #007bff; */
   border-color: grey;
 }
 
@@ -68,28 +65,21 @@ a:hover {
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: 2.5em;
   line-height: 1.1;
 }
 
-
-.modalForm {
+.modalBox {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
   gap: 10px;
 }
 
-.modalInput {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-}
 
 .modalButton {
-  background: #007bff;
-  /*background: grey;*/
+  background-color: black;
   color: white;
   border: none;
   padding: 8px;
@@ -97,17 +87,33 @@ h1 {
   border-radius: 5px;
   cursor: pointer;
 }
-
 .modalButton:hover {
-  background: #0056b3;
+  background-color: navajowhite;
+  color: black; 
 }
-/*
-.modalCloseButton {
-  background: transparent;
-  border: none;
+
+
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5px;
+  gap: 10px;
+}
+
+.modalInput {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  font-size: 14px;
+  border: 1px solid navajowhite;
+}
+
+
+
+.error {
   color: red;
-  cursor: pointer;
-  font-size: 12px;
-  margin-top: 8px;
+  font-size: 14px;
+  margin-top: 5px;
 }
-*/
