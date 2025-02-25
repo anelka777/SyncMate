@@ -6,6 +6,7 @@ function Register( {closeModal, handleSuccess }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const apiUrl = import.meta.env.VITE_API_URL;
     
 
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -13,14 +14,14 @@ function Register( {closeModal, handleSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!emailPattern.test(email)) {   /*NEW*/
+        if (!emailPattern.test(email)) {
             setError('Please enter a valid email address');
-            return; // stop to send the form
+            return;
         }
 
         setError('');
 
-        const response = await fetch('http://localhost:3000/api/v1/auth/register', {
+        const response = await fetch(`${apiUrl}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password }),
