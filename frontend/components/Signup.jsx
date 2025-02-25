@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 
-function Register( {closeModal}) {
+function Register( {closeModal, handleSuccess }) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -15,7 +15,7 @@ function Register( {closeModal}) {
 
         if (!emailPattern.test(email)) {   /*NEW*/
             setError('Please enter a valid email address');
-            return; // Останавливаем отправку формы
+            return; // stop to send the form
         }
 
         setError('');
@@ -31,6 +31,7 @@ function Register( {closeModal}) {
             localStorage.setItem('token', data.token); 
             alert('Registration successful');
             closeModal();
+            handleSuccess()
         } else {
             alert('Error: ' + data.msg);
         }

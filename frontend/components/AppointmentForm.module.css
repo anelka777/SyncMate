@@ -21,3 +21,18 @@
     display: flex;
     gap: 10px;
 }
+
+textarea {
+    width: 100%; 
+    max-width: 100%; 
+    height: calc(1.5em * 4);
+    resize: none; 
+    overflow: hidden; 
+    white-space: pre-wrap; 
+    word-wrap: break-word; 
+    overflow-wrap: break-word; 
+    font-size: 14px;
+    line-height: 1.5;
+    box-sizing: border-box;
+    padding: 8px;
+}
