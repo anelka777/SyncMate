@@ -65,7 +65,10 @@ const fetchAppointments = async () => {
   };
 
   const handleSuccessSignup = () => {
-    closeModal();
+    closeModal();  // Закрываем модалку после успешной регистрации
+    setTimeout(() => {
+      openModal('login');  // Открываем модальное окно для входа
+    }, 500);  // Задержка для плавности перехода
   };
 
   const handleSuccessLogin = (data) => {
@@ -82,7 +85,13 @@ const fetchAppointments = async () => {
   return (
     <div className={styles.appContainer}>
       <nav className={styles.nav}>
-        <NavLink to="/">SyncMate</NavLink>
+        <NavLink 
+          to="/"
+          className={isAuthenticated ? styles.disabledLink : ""}
+          tabIndex={isAuthenticated ? -1 : 0}
+        >
+          SyncMate
+        </NavLink>
         {isAuthenticated && userName && <span className={styles.userName}>Hello, {userName}!</span>}
         <div className={styles.authButtons}>
           {!isAuthenticated && <button onClick={() => openModal('login')}>Log in</button>}

@@ -16,7 +16,7 @@ function Dashboard() {
     const [activeTab, setActiveTab] = useState('today'); // "today" или "tomorrow"
     const [currentPageReminders, setCurrentPageReminders] = useState(1);
     const [currentPageAppointments, setCurrentPageAppointments] = useState(1);
-    const itemsPerPage = 12;
+    const itemsPerPage = 8;
     const [filterStatus, setFilterStatus] = useState("all"); // Храним текущий фильтр
     const [filterDate, setFilterDate] = useState('');
 
@@ -30,7 +30,7 @@ function Dashboard() {
             day: '2-digit',
             hour: '2-digit',
             minute: '2-digit',
-            hour12: true, // Для 12-часового формата (AM/PM)
+            hour12: true, // (AM/PM)
         });
     };    
 
@@ -250,7 +250,8 @@ function Dashboard() {
                                         <div key={appointment._id} 
                                         className={`${styles.appointmentItemToday} 
                                         ${appointment?.status === 'completed' ? styles.completed : ''} 
-                                        ${appointment?.status === 'canceled' ? styles.canceled : ''}`}>
+                                        ${appointment?.status === 'canceled' ? styles.canceled : ''}
+                                        ${appointment?.status === 'no show' ? styles.noshow : ''}`}>
                                             <div className={styles.appItemOne}>
                                                 <p>{new Date(appointment.date)
                                                     .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
@@ -322,20 +323,23 @@ function Dashboard() {
                                     <div key={appointment._id} 
                                         className={`${styles.appointmentItem} 
                                         ${appointment.status === 'completed' ? styles.completed : ''} 
-                                        ${appointment.status === 'canceled' ? styles.canceled : ''}`}>
+                                        ${appointment.status === 'canceled' ? styles.canceled : ''}
+                                        ${appointment.status === 'no show' ? styles.noshow : ''}`}>
+                                        <div>
                                             <h3>{appointment.title}</h3>
                                             <p><strong>Date: </strong>{appointment.date ? formatDate(appointment.date) : "No Date"}</p>
                                             <p><strong>Status: </strong>{appointment.status}</p>
                                             <p><strong>Description: </strong>{appointment.description}</p>
-                                            <div className={styles.appItemBtns}>
-                                                <button onClick={() => handleOpenModal(appointment)}>Edit</button>
-                                                <button
-                                                    onClick={() => handleDeleteAppointment(appointment._id)}
-                                                    className={styles.deleteButton}
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
+                                        </div>
+                                        <div className={styles.appItemBtns}>
+                                            <button onClick={() => handleOpenModal(appointment)}>Edit</button>
+                                            <button
+                                                onClick={() => handleDeleteAppointment(appointment._id)}
+                                                className={styles.deleteButton}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
                                     </div>
                                 ))
                         ) : (

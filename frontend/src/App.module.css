@@ -60,3 +60,11 @@
   gap: 10px;
 }
 
+.disabledLink {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.userName {
+  font-weight: 500;
+}

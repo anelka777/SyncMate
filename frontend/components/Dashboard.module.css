@@ -62,27 +62,27 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
     border-radius: 8px;
     border: 1px solid white;
-    padding: 10px;
+    padding: 10px 0 10px 0;
     flex-direction: column;
-    justify-content:center;
+    justify-content: center;
     align-items: center;
     text-align: center;
     flex: 2;
-    gap: 10px;
+    gap: 5px;
     backdrop-filter: blur(2px);
     
 }
 
 .appointmentListBox {
     border-radius: 8px;
-    padding: 10px;
-    margin: 10px;
+    padding: 5px;
+    margin: 5px;
 }
 
 .appointmentList {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;    
+    justify-content: center
 }
 
 .appointmentItemToday {
@@ -90,23 +90,27 @@
     background-color: rgba(255, 222, 173, 0.7);
     box-shadow: 0 4px 6px rgba(0, 0, 0 , 0.5);
     color:#1d1d1d;
-    max-width: 280px;  /*350px*/
+    width: 280px;
     border: 1px solid white;
     border-radius: 8px;
-    padding: 6px; /*10px*/
-    margin: 4px;  /*5px*/
-    font-size: 0.9rem;
+    padding: 5px;
+    margin: 4px;
+    font-size: 0.8rem;
+    gap:5px;
 }
 
 .appItemOne {
-    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    text-align: start;
+    padding: 2px;
 }
 
 .appItemTwo {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    padding: 4px;
+    text-align: start;
+    padding: 2px;
 }
 
 .tabContainer {
@@ -135,7 +139,7 @@
     flex-direction: column;
     align-items: center;
     flex: 3;
-    gap: 10px;
+    gap: 5px;
     background-color:  rgba(157, 142, 126, 0.5);
     border-radius: 8px;
     border: 1px solid white;
@@ -148,7 +152,7 @@
 .filtersContainer {
     display: flex;
     justify-content: space-between;
-    gap: 5px;
+    gap: 10px;
 }
 
 .filterContainer {
@@ -189,16 +193,23 @@
 
 /*карточка*/
 .appointmentItem {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 280px; 
+    border-radius: 8px;
+    padding: 10px;
+    margin: 4px;
+    font-size: 0.85rem;
     background-color: rgba(255, 222, 173, 0.7);
     border: 1px solid white;
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 6px rgba(0, 0, 0 , 0.5);
     color:#1d1d1d;
-    max-width: 280px; /*350px*/
-    border-radius: 8px;
-    padding: 6px; /*10px*/
-    margin: 4px; /*5px*/
-    font-size: 0.9rem;
+    gap: 5px;
+}
+
+.appointmentItem div {
+    overflow-wrap: anywhere;
 }
 
 .completed {
@@ -213,9 +224,16 @@
     backdrop-filter: blur(10px);
 }
 
+.noshow {
+    background: rgba(239, 168, 187, 0.5);
+    border: 1px solid white;
+    backdrop-filter: blur(10px);
+}
+
 
 .appItemBtns {
     display: flex;
+    align-items: end;
     gap: 4px;
 }
 
