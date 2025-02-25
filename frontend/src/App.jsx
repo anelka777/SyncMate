@@ -8,19 +8,20 @@ import Modal from 'react-modal';
 import "./index.css";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Состояние для проверки, авторизован ли user
-  const [isModalOpen, setIsModalOpen] = useState(false); // Состояние для открытия мод окна
-  const [modalType, setModalType] = useState(null); // Тип мод окна (login или signup)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState(null);
   const [userName, setUserName] = useState("");
   const [appointments, setAppointments] = useState([]);
-  const navigate = useNavigate(); // Для переходов на другие страницы
+  const navigate = useNavigate();
+  const apiUrl = import.meta.env.VITE_API_URL;
 
 
-  useEffect(() => { // Проверка, есть ли токен в localStorage
+  useEffect(() => {
     const token = localStorage.getItem('token');
     const storedUserName = localStorage.getItem("userName");
     if (token) {
-      setIsAuthenticated(true); // Если токен есть, считаем, что пользователь авторизован
+      setIsAuthenticated(true);
       fetchAppointments();
     }
     if (storedUserName) {
@@ -28,35 +29,35 @@ function App() {
     } 
   }, []);
 
-// Функция для загрузки appointments с сервера
+
 const fetchAppointments = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/v1/appointments', {
+    const response = await fetch(`${apiUrl}/appointments`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`, // Передаем токен для авторизации
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
     });
     const data = await response.json();
-    setAppointments(data); // Сохраняем appointments в стейте
+    setAppointments(data);
   } catch (error) {
     console.error('Error fetching appointments:', error);
   }
 };
 
 
-  const handleLogout = () => {    // Функция для выхода из системы (удаляет токен)
+  const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userName');
     setIsAuthenticated(false);
     setUserName("");
-    setAppointments([]); // Очищаем appointments при выходе
+    setAppointments([]);
     navigate('/');
   };
 
   const openModal = (type) => {
-    setModalType(type); // Устанавливаем тип мод окна (login или signup)
+    setModalType(type);
     setIsModalOpen(true);
   };
 
@@ -65,21 +66,21 @@ const fetchAppointments = async () => {
   };
 
   const handleSuccessSignup = () => {
-    closeModal();  // Закрываем модалку после успешной регистрации
+    closeModal();
     setTimeout(() => {
-      openModal('login');  // Открываем модальное окно для входа
-    }, 500);  // Задержка для плавности перехода
+      openModal('login');
+    }, 500);
   };
 
   const handleSuccessLogin = (data) => {
     closeModal();
-    setIsAuthenticated(true); // Устанавливаем, что пользователь авторизован
+    setIsAuthenticated(true);
     if (data.user && data.user.name) { 
-      localStorage.setItem("userName", data.user.name); // NAME
+      localStorage.setItem("userName", data.user.name);
       setUserName(data.user.name);
     } 
-    navigate('/dashboard'); // Переходим на страницу Dashboard
-    fetchAppointments(); // После успешного входа загружаем appointments
+    navigate('/dashboard');
+    fetchAppointments();
   };
 
   return (

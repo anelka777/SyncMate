@@ -13,13 +13,13 @@ function Dashboard() {
         status: 'scheduled',
         description: '',
     });
-    const [activeTab, setActiveTab] = useState('today'); // "today" или "tomorrow"
+    const [activeTab, setActiveTab] = useState('today');
     const [currentPageReminders, setCurrentPageReminders] = useState(1);
     const [currentPageAppointments, setCurrentPageAppointments] = useState(1);
     const itemsPerPage = 8;
-    const [filterStatus, setFilterStatus] = useState("all"); // Храним текущий фильтр
+    const [filterStatus, setFilterStatus] = useState("all");
     const [filterDate, setFilterDate] = useState('');
-
+    const apiUrl = import.meta.env.VITE_API_URL;
 
 
     const formatDate = (dateString) => {
@@ -30,14 +30,14 @@ function Dashboard() {
             day: '2-digit',
             hour: '2-digit',
             minute: '2-digit',
-            hour12: true, // (AM/PM)
+            hour12: true,
         });
     };    
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
-            fetch('http://localhost:3000/api/v1/appointments', {
+            fetch(`${apiUrl}/appointments`, {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -59,7 +59,7 @@ function Dashboard() {
         setCurrentPageReminders(1);
     }, [filterStatus, filterDate, activeTab]);
 
-    // Функция открытия модального окна для добавления нового или редактирования существующего
+
     const handleOpenModal = (appointment = null) => {
         if (appointment) {
             setFormData({
@@ -80,7 +80,6 @@ function Dashboard() {
         setIsModalOpen(false);
     };
 
-    // Функция для изменения данных в форме
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -89,15 +88,14 @@ function Dashboard() {
         }));
     };
 
-    // Функция для отправки данных
     const handleSubmit = (appointmentData) => {
         const token = localStorage.getItem('token');
-        const isEditing = appointmentData._id; // Проверяем, редактируем ли мы существующее назначение
+        const isEditing = appointmentData._id;
         if (token) {
             const method = isEditing ? 'PATCH' : 'POST';
             const url = isEditing
-                ? `http://localhost:3000/api/v1/appointments/${appointmentData._id}`
-                : 'http://localhost:3000/api/v1/appointments';
+                ? `${apiUrl}/appointments/${appointmentData._id}`
+                : `${apiUrl}/appointments`;
 
             fetch(url, {
                 method: method,
@@ -122,18 +120,18 @@ function Dashboard() {
                                 data.appointment,
                             ]);
                         }
-                        handleCloseModal(); // Закрываем модалку после отправки
+                        handleCloseModal();
                     }
                 })
                 .catch((error) => console.error('Error submitting appointment:', error));
         }
     };
 
-    // Функция удаления записи
+
     const handleDeleteAppointment = (appointmentId) => {
         const token = localStorage.getItem('token');
         if (token) {
-            fetch(`http://localhost:3000/api/v1/appointments/${appointmentId}`, {
+            fetch(`${apiUrl}/appointments/${appointmentId}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -150,7 +148,7 @@ function Dashboard() {
     };
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Обнуляем время
+    today.setHours(0, 0, 0, 0);
     
     const upcomingAppointments = appointments.filter((appointment) => {
         const appointmentDate = new Date(appointment.date);
@@ -162,9 +160,9 @@ function Dashboard() {
     );
     
     const finalFilteredAppointments = filteredAppointments.filter((appointment) => {
-        if (!filterDate) return true; // Если дата не выбрана, показываем все
+        if (!filterDate) return true;
         const appointmentDate = new Date(appointment.date);
-        const formattedAppointmentDate = appointmentDate.toLocaleDateString('en-CA'); // "YYYY-MM-DD"
+        const formattedAppointmentDate = appointmentDate.toLocaleDateString('en-CA');
         return formattedAppointmentDate === filterDate;
     });
 
@@ -172,9 +170,9 @@ function Dashboard() {
     const getFilteredAppointments = (day) => {
         const filterDate = new Date();
         if (day === 'tomorrow') {
-            filterDate.setDate(filterDate.getDate() + 1); // Завтра
+            filterDate.setDate(filterDate.getDate() + 1);
         }
-        filterDate.setHours(0, 0, 0, 0); // Сбрасываем время
+        filterDate.setHours(0, 0, 0, 0);
     
         return appointments.filter((appointment) => {
             const appointmentDate = new Date(appointment.date);
@@ -282,7 +280,6 @@ function Dashboard() {
                         </button>
                     </div>                    
                 </div>
-
                 
     {/*=====================APPOINTMENT CONTAINER=============================  */}
                 <div className={styles.allAppointmentContainer}>
